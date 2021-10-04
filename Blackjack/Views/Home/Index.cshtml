@@ -1,55 +1,32 @@
 ﻿@model IEnumerable<Blackjack.Models.Card>
 @{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Blackjack";
 
 }
-<div class="row">
-    @*@Session["Cartas"];
-    <table class="table">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Suit)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Symbol)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Color)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Score)
-            </th>
-        </tr>
-
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Suit)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Symbol)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Color)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Score)
-                </td>
-            </tr>
-        }
-    </table>*@
-    <br />
-    <br />
-    <div>
-        <input class="text-box" id="cant" />
-    </div>
-    <br />
-    <button id="dealBtn" onclick="deal();" type="button">Deal</button>
-    <br />
-    <div>
-        <ul id="listaCartas">
+<div class="row gameBoard">
+    <div class="col-12 dealerContainer">
+        <h2>Maso del Dealer</h2>
+        <span><strong>Puntaje:</strong></span>
+        <span id="dealerScore"></span>
+        <ul id="dealerHand">
         </ul>
+
+    </div>
+    <div class="col-12 playerContainer">
+        <h2>Tu Maso</h2>
+        <span><strong>Puntaje:</strong></span>
+        <span id="playerScore"></span>
+        <ul id="playerHand">
+        </ul>
+    </div>
+    <div class="cantidadCartas">
+        <span><strong>Cantidad de cartas:</strong></span> <input class="text-box" id="cant" disabled/>
+    </div>
+    <div class="options-container">
+        <button id="initBtn" onclick="initGame();" type="button">Iniciar Juego</button>
+        <button id="restartBtn" onclick="restartGame();" type="button">Reiniciar Juego</button>
+        <button id="evaluateBtn" onclick="evaluateScore();" type="button">Pides Carta</button>
+        <button id="stopBtn" onclick="stopScore();" type="button">Pasas (el Dealer comienza a jugar)</button>
     </div>
 </div>
 
@@ -57,39 +34,126 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 <script type="text/javascript">
-    @*function deal() {
-            let model = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model, Newtonsoft.Json.Formatting.Indented));
-            alert(JSON.parse(JSON.stringify({ deck: model })));
-            $.ajax({
-                type: 'post',
-                async: false,
-                url: '@Url.Action("Init", "Home")',
-                contentType: 'application/json; charset=utf-8',
-                dataType: "json",
-                data: JSON.parse(JSON.stringify({ deck: model })),
-                success: function (data) {
-                    alert(data);
-                    //CierraPopup();
+
+    $(document).ready(function () {
+        $('#restartBtn').hide();
+    });
+
+    function initGame() {
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '@Url.Action("Init", "Home")',
+            contentType: 'application/json; charset=utf-8',
+            dataType: "json",
+            success: function (data) {
+                for (let i = 0; i <= 1; i++) {
+                    if (i == 0) {
+                        let card = '<div class="card"></div >';
+                        $('#dealerHand').append('<li>' + card + '</li>');
+                    } else {
+                        carta(data.cartasD[i].Symbol, data.cartasD[i].Suit, data.cartasD[i].Score, data.cartasD[i].Color, '#dealerHand');
+                        $('#dealerScore').text(data.cartasD[i].Score);
+                    }
+                    
+                    carta(data.cartasP[i].Symbol, data.cartasP[i].Suit, data.cartasP[i].Score, data.cartasP[i].Color, '#playerHand');
                 }
-            });
-        };*@
-    function deal() {
-            $.ajax({
-                type: 'post',
-                async: false,
-                url: '@Url.Action("Init", "Home")',
-                contentType: 'application/json; charset=utf-8',
-                dataType: "json",
-                //data: JSON.parse(JSON.stringify({ deck: model })),
-                success: function (data) {
-                    //alert(data.carta.Suit + ' ' + data.carta.Symbol + ' ' + data.carta.Color + ' ' + data.carta.Score);
-                    let item = data.carta.Suit + ' ' + data.carta.Symbol + ' ' + data.carta.Color + ' ' + data.carta.Score;
-                    $('#listaCartas').append('<li>' + item + '</li>');
-                    $('#cant').val(data.cantidad);
-                    //CierraPopup();
+                //$('#dealerScore').text(data.scoreD);
+                $('#playerScore').text(data.scoreP);
+                $('#cant').val(data.cantidad);
+
+                $('#restartBtn').show();
+                $('#initBtn').hide();
+            }
+        });
+    };
+
+    function evaluateScore() {
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '@Url.Action("EvaluateScore", "Home")',
+            contentType: 'application/json; charset=utf-8',
+            dataType: "json",
+            //data: JSON.parse(JSON.stringify({ deck: model })),
+            success: function (data) {
+                carta(data.carta.Symbol, data.carta.Suit, data.carta.Score, data.carta.Color, '#playerHand');
+
+                $('#playerScore').text(data.scoreP);
+                $('#cant').val(data.cantidad);
+
+                if (data.scoreP > 21) {
+                    alert("Perdiste, te pasaste de 21.");
+                    stopGame();
                 }
-            });
-        };
+                else if (data.scoreP == 21) {
+                    alert("Ganaste");
+                    stopGame();
+                }
+            }
+        });
+    }
+
+    function stopScore() {
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '@Url.Action("Stop", "Home")',
+            contentType: 'application/json; charset=utf-8',
+            dataType: "json",
+            //data: JSON.parse(JSON.stringify({ deck: model })),
+            success: function (data) {
+                $('#dealerHand').empty();
+                
+                data.cards.map((e) => {
+                    carta(e.Symbol, e.Suit, e.Score, e.Color, '#dealerHand');
+                })
+
+                if (data.scoreD > 21) {
+                    alert("Ganaste, el dealer saco más de 21")
+                    stopGame();
+                }
+                if (data.scoreD >= data.scoreP && data.scoreD <= 21) {
+                    alert('El dealer gano el juego')
+                    stopGame();
+                }
+
+                $('#dealerScore').text(data.scoreD);
+            }
+        });
+    }
+
+    function restartGame(){
+        $.ajax({
+            type: 'post',
+            async: false,
+            url: '@Url.Action("Restart", "Home")',
+            contentType: 'application/json; charset=utf-8',
+            dataType: "json",
+            //data: JSON.parse(JSON.stringify({ deck: model })),
+            success: function (data) {
+
+                console.log(data.result);
+                $('#dealerHand').empty();
+                $('#playerHand').empty();
+
+                $('#dealerScore').text('');
+                $('#playerScore').text('');
+
+                $('#cant').val('');
+
+                $('#evaluateBtn').removeAttr('disabled');
+                $('#stopBtn').removeAttr('disabled');
+                $('#restartBtn').hide();
+                $('#initBtn').show();
+            }
+        });
+    }
+
+    function stopGame() {
+        $('#evaluateBtn').attr('disabled', 'disabled');
+        $('#stopBtn').attr('disabled', 'disabled');
+    }
 </script>
 
 }

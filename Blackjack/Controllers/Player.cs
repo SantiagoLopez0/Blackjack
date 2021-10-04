@@ -9,6 +9,8 @@ namespace Blackjack.Controllers
     public class Player
     {
         private List<Card> hand= new List<Card>();
+
+        private int score = new int();
         public Player()
         {
         }
@@ -25,5 +27,6 @@ namespace Blackjack.Controllers
         }
 
         public List<Card> Hand { get => hand; set => hand = value; }
+        public int Score { get => score; set => score = value; }
     }
 }

@@ -13,6 +13,8 @@ namespace Blackjack.Controllers
 
         private List<Card> hand = new List<Card>();
 
+        private int score = new int();
+
         public Dealer()
         {
         }
@@ -29,7 +31,7 @@ namespace Blackjack.Controllers
 
         public void Generate()
         {
-            string[] suit = new string[] { "corazones", "diamantes", "trebol", "picas" };
+            string[] suit = new string[] { "corazones", "diamantes", "picas", "trebol" };
             string[] symbol = new string[] { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
 
             foreach (string s in suit)
@@ -50,7 +52,7 @@ namespace Blackjack.Controllers
             Random randNum = new Random();
             while (deck.Count > 0)
             {
-                int val = randNum.Next(0, deck.Count - 1);
+                int val = randNum.Next(0, deck.Count);
                 newDeck.Add(deck[val]);
                 deck.RemoveAt(val);
             }
@@ -73,6 +75,6 @@ namespace Blackjack.Controllers
 
         public List<Card> Deck { get => deck; set => deck = value; }
         public List<Card> Hand { get => hand; set => hand = value; }
-
+        public int Score { get => score; set => score = value; }
     }
 }

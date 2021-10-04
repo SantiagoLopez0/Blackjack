@@ -1,6 +1,7 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    height: 100vh;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -21,4 +22,52 @@ input,
 select,
 textarea {
     max-width: 280px;
+}
+
+.gameBoard{
+    height: 100vh;
+}
+
+.dealerContainer, .playerContainer{
+    margin-top: 20px;
+    height: 40vh;
+}
+
+#dealerHand, #playerHand {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    height: 100%;
+    list-style: none;
+}
+
+.cantidadCartas{
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.cantidadCartas span{
+    margin-right: 5px;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 35px;
+    margin-top: 10px;
+}
+
+.options-container button{
+    margin-right: 5px;
+}
+
+h2{
+    color: white;
+    font-weight: bold;
+}
+
+span {
+    color: white;
 }
