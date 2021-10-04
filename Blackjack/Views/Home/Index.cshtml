@@ -1,31 +1,95 @@
-﻿@{
+﻿@model IEnumerable<Blackjack.Models.Card>
+@{
     ViewBag.Title = "Home Page";
+
 }
-
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
-
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+    @*@Session["Cartas"];
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Suit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Symbol)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Color)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Score)
+            </th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Suit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Symbol)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Color)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Score)
+                </td>
+            </tr>
+        }
+    </table>*@
+    <br />
+    <br />
+    <div>
+        <input class="text-box" id="cant" />
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    <br />
+    <button id="dealBtn" onclick="deal();" type="button">Deal</button>
+    <br />
+    <div>
+        <ul id="listaCartas">
+        </ul>
     </div>
 </div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+<script type="text/javascript">
+    @*function deal() {
+            let model = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model, Newtonsoft.Json.Formatting.Indented));
+            alert(JSON.parse(JSON.stringify({ deck: model })));
+            $.ajax({
+                type: 'post',
+                async: false,
+                url: '@Url.Action("Init", "Home")',
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                data: JSON.parse(JSON.stringify({ deck: model })),
+                success: function (data) {
+                    alert(data);
+                    //CierraPopup();
+                }
+            });
+        };*@
+    function deal() {
+            $.ajax({
+                type: 'post',
+                async: false,
+                url: '@Url.Action("Init", "Home")',
+                contentType: 'application/json; charset=utf-8',
+                dataType: "json",
+                //data: JSON.parse(JSON.stringify({ deck: model })),
+                success: function (data) {
+                    //alert(data.carta.Suit + ' ' + data.carta.Symbol + ' ' + data.carta.Color + ' ' + data.carta.Score);
+                    let item = data.carta.Suit + ' ' + data.carta.Symbol + ' ' + data.carta.Color + ' ' + data.carta.Score;
+                    $('#listaCartas').append('<li>' + item + '</li>');
+                    $('#cant').val(data.cantidad);
+                    //CierraPopup();
+                }
+            });
+        };
+</script>
+
+}
