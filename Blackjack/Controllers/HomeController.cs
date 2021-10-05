@@ -57,12 +57,26 @@ namespace Blackjack.Controllers
 
             foreach (Card c in dealerCards)
             {
-                dealerScore = dealerScore + c.Score;
+                if(c.Symbol == "A")
+                {
+                    dealerScore = dealerScore + 11;
+                } 
+                else
+                {
+                    dealerScore = dealerScore + c.Score;
+                }
             }
 
             foreach (Card c in playerCards)
             {
-                playerScore = playerScore + c.Score;
+                if (c.Symbol == "A")
+                {
+                    playerScore = playerScore + 11;
+                }
+                else
+                {
+                    playerScore = playerScore + c.Score;
+                }
             }
 
             d.Score = dealerScore;
@@ -81,13 +95,25 @@ namespace Blackjack.Controllers
         }
         public ActionResult EvaluateScore()
         {
-            List<Card> playerCards = p.Hand;
             List<Card> deck = (List<Card>)Session["tabla"];
 
             Card card = giveCard();
             p.AddCard(card);
 
-            int playerScore = p.Score + card.Score;
+            int playerScore = 0;
+
+            foreach (Card c in p.Hand)
+            {
+                if(c.Symbol == "A")
+                {
+                    if(p.Score + c.Score > 21)
+                    {
+                        playerScore = p.Score - 10;
+                    }
+                }
+            }
+
+            playerScore = p.Score + card.Score;
 
             p.Score = playerScore;
 
@@ -119,7 +145,19 @@ namespace Blackjack.Controllers
                 {
                     Card card = giveCard();
                     d.AddCard(card);
-                    d.Score = d.Score + card.Score;
+
+                    if(card.Symbol == "A")
+                    {
+                        if (d.Score + card.Score <= 21)
+                        {
+                            d.Score = d.Score + 11;           
+                        }
+                    } 
+                    else
+                    {
+                        d.Score = d.Score + card.Score;
+                    }
+                    
                     if (d.Score > p.Score || d.Score >= 21)
                     {
                         dMenorQueP = false;

@@ -47,6 +47,8 @@
             contentType: 'application/json; charset=utf-8',
             dataType: "json",
             success: function (data) {
+                $('#evaluateBtn').removeAttr('disabled');
+                $('#stopBtn').removeAttr('disabled');
                 for (let i = 0; i <= 1; i++) {
                     if (i == 0) {
                         let card = '<div class="card"></div >';
@@ -142,10 +144,11 @@
 
                 $('#cant').val('');
 
-                $('#evaluateBtn').removeAttr('disabled');
-                $('#stopBtn').removeAttr('disabled');
+                
                 $('#restartBtn').hide();
                 $('#initBtn').show();
+
+                stopGame()
             }
         });
     }
